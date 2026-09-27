@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -10,7 +11,10 @@ import 'core/theme/theme_provider.dart';
 import 'routing/app_router.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  // Preserve the splash screen until initialization is done
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // Initialize Hive local storage for settings and offline persistence
   await Hive.initFlutter();
@@ -24,6 +28,9 @@ Future<void> main() async {
   } catch (e) {
     debugPrint('Notice: Firebase.initializeApp() error: $e');
   }
+
+  // Remove splash screen after initialization
+  FlutterNativeSplash.remove();
 
   runApp(
     const ProviderScope(

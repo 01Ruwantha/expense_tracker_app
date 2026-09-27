@@ -40,6 +40,7 @@ dependencies:
   # Other utilities
   equatable: ^2.0.5
   dartz: ^0.10.1
+  flutter_native_splash: ^2.4.8
 
 dev_dependencies:
   flutter_test:
@@ -65,3 +66,22 @@ flutter_launcher_icons:
     image_path: "assets/images/app_icon.png"
     background_color: "#hexcode"
     theme_color: "#hexcode"
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/images/splash_logo_light.png
+  # branding: assets/branding-production.png
+  branding_bottom_padding: 24
+  color_dark: "#05080D"
+  image_dark: assets/images/splash_logo_dark.png
+  # branding_dark: assets/branding-production.png
+
+  android_12:
+    image: assets/images/splash_logo_light.png
+    icon_background_color: "#ffffff"
+    image_dark: assets/images/splash_logo_dark.png
+    icon_background_color_dark: "#05080D"
+
+  android: true
+  ios: true
+  web: false
