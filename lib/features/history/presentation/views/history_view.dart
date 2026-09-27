@@ -92,7 +92,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
         );
         if (range == null) return;
         start = range.start;
-        end = DateTime(range.end.year, range.end.month, range.end.day, 23, 59, 59);
+        end = DateTime(
+            range.end.year, range.end.month, range.end.day, 23, 59, 59);
         break;
     }
 
@@ -148,7 +149,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
               content: Text(
                 success ? 'Expense deleted' : 'Failed to delete expense',
               ),
-              backgroundColor: success ? AppColors.lightPrimary : AppColors.lightError,
+              backgroundColor:
+                  success ? AppColors.lightPrimary : AppColors.lightError,
             ),
           );
         }
@@ -163,7 +165,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
     final yesterday = today.subtract(const Duration(days: 1));
 
     for (final expense in expenses) {
-      final expDate = DateTime(expense.date.year, expense.date.month, expense.date.day);
+      final expDate =
+          DateTime(expense.date.year, expense.date.month, expense.date.day);
       String key;
       if (expDate == today) {
         key = 'Today';
@@ -207,7 +210,7 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go(AppRoutes.addExpense),
+        onPressed: () => context.push(AppRoutes.addExpense),
         tooltip: AppStrings.addExpense,
         child: const Icon(Icons.add_rounded, size: 28),
       ),
@@ -259,7 +262,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
               // Search bar
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   child: Container(
                     decoration: BoxDecoration(
                       color: isDark
@@ -268,8 +272,10 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: isDark
-                            ? AppColors.darkOutlineVariant.withValues(alpha: 0.5)
-                            : AppColors.lightOutlineVariant.withValues(alpha: 0.5),
+                            ? AppColors.darkOutlineVariant
+                                .withValues(alpha: 0.5)
+                            : AppColors.lightOutlineVariant
+                                .withValues(alpha: 0.5),
                       ),
                     ),
                     child: TextField(
@@ -278,7 +284,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                       decoration: InputDecoration(
                         hintText: AppStrings.search,
                         hintStyle: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                          color: colorScheme.onSurfaceVariant
+                              .withValues(alpha: 0.7),
                         ),
                         prefixIcon: Icon(
                           Icons.search_rounded,
@@ -312,7 +319,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                   height: 48,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
                     children: [
                       // All Categories chip
                       Padding(
@@ -381,7 +389,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                       _buildDateChip('7 Days', DateQuickFilter.last7Days),
                       const SizedBox(width: 8),
                       _buildDateChip(
-                        filter.startDate != null && _dateFilter == DateQuickFilter.custom
+                        filter.startDate != null &&
+                                _dateFilter == DateQuickFilter.custom
                             ? '${DateFormat('MMM d').format(filter.startDate!)} - ${DateFormat('MMM d').format(filter.endDate!)}'
                             : 'Custom',
                         DateQuickFilter.custom,
@@ -419,7 +428,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
               }
 
               // Compute total for filtered list
-              final totalAmount = expenses.fold<double>(0, (sum, e) => sum + e.amount);
+              final totalAmount =
+                  expenses.fold<double>(0, (sum, e) => sum + e.amount);
               final grouped = _groupByDate(expenses);
 
               return ListView.builder(
@@ -505,7 +515,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.only(right: 20),
                               decoration: BoxDecoration(
-                                color: AppColors.lightError.withValues(alpha: 0.15),
+                                color: AppColors.lightError
+                                    .withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: const Icon(
@@ -519,7 +530,7 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                             },
                             child: ExpenseTile(
                               expense: expense,
-                              onTap: () => context.go(
+                              onTap: () => context.push(
                                 '${AppRoutes.editExpense}/${expense.id}',
                               ),
                             ),
@@ -538,7 +549,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
     );
   }
 
-  Widget _buildDateChip(String label, DateQuickFilter filterType, {IconData? icon}) {
+  Widget _buildDateChip(String label, DateQuickFilter filterType,
+      {IconData? icon}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;

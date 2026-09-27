@@ -31,8 +31,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.darkSurface : AppColors.lightSurface,
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentNavIndex,
         onTap: (index) {
@@ -53,7 +52,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go(AppRoutes.addExpense),
+        onPressed: () => context.push(AppRoutes.addExpense),
         tooltip: AppStrings.addExpense,
         child: const Icon(Icons.add_rounded, size: 28),
       ),
@@ -76,7 +75,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     height: 32,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [colorScheme.primary, colorScheme.primaryContainer],
+                        colors: [
+                          colorScheme.primary,
+                          colorScheme.primaryContainer
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -94,8 +96,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                           letterSpacing: 1.5,
                         ),
                       ),
-                      Text(AppStrings.dashboard,
-                          style: textTheme.titleMedium),
+                      Text(AppStrings.dashboard, style: textTheme.titleMedium),
                     ],
                   ),
                 ],
@@ -177,8 +178,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
             ),
             Text(
               AppStrings.monthlyOverview,
-              style: textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant),
+              style: textTheme.bodyMedium
+                  ?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ],
         ),
@@ -259,8 +260,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 
-  Widget _buildCategorySection(
-      ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildCategorySection(ColorScheme colorScheme, TextTheme textTheme) {
     final breakdown = ref.watch(categoryBreakdownProvider);
     final total = ref.watch(monthlyTotalProvider);
 
@@ -273,8 +273,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             Text(AppStrings.categoriesBreakdown, style: textTheme.titleLarge),
             Text(
               '${breakdown.length} ${AppStrings.categories}',
-              style: textTheme.labelSmall
-                  ?.copyWith(color: colorScheme.primary),
+              style: textTheme.labelSmall?.copyWith(color: colorScheme.primary),
             ),
           ],
         ),
@@ -320,8 +319,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(AppStrings.recentExpenses,
-                style: textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700)),
+                style: textTheme.titleLarge
+                    ?.copyWith(fontWeight: FontWeight.w700)),
             GestureDetector(
               onTap: () => context.go(AppRoutes.history),
               child: Row(
@@ -341,7 +340,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
         expensesAsync.when(
           loading: () => Column(
             children: List.generate(
-                4, (_) => const Padding(
+                4,
+                (_) => const Padding(
                       padding: EdgeInsets.only(bottom: 10),
                       child: ExpenseItemSkeleton(),
                     )),
@@ -370,9 +370,17 @@ class _HomeViewState extends ConsumerState<HomeView> {
                         padding: const EdgeInsets.only(bottom: 10),
                         child: ExpenseTile(
                           expense: expense,
-                          onTap: () => context.go(
-                            '${AppRoutes.editExpense}/${expense.id}',
-                          ),
+                          onTap: () {
+                            if (expense.id.isEmpty) {
+                              return;
+                            }
+                            context.pushNamed(
+                              'edit-expense',
+                              pathParameters: {
+                                AppRouteParams.expenseId: expense.id
+                              },
+                            );
+                          },
                         ),
                       ))
                   .toList(),

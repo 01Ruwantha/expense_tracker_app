@@ -44,20 +44,35 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
 
   void _loadExpense() {
     final expenses = ref.read(expensesStreamProvider).valueOrNull ?? [];
-    final expense = expenses.firstWhere(
-      (e) => e.id == widget.expenseId,
-      orElse: () => expenses.isEmpty
-          ? throw Exception('Expense not found')
-          : expenses.first,
-    );
-    if (expense.id == widget.expenseId) {
+
+    // Safe lookup (avoids type mismatch on orElse)
+    final match = expenses.where((e) => e.id == widget.expenseId).toList();
+    if (match.isEmpty) return;
+
+    final expense = match.first;
+
+    // Handle both ExpenseEntity and ExpenseModel
+    if (expense is ExpenseEntity) {
       _existingExpense = expense;
-      _titleController.text = expense.title;
-      _amountController.text = expense.amount.toStringAsFixed(2);
-      _noteController.text = expense.note ?? '';
-      _selectedCategory = expense.category;
-      _selectedDate = expense.date;
+    } else {
+      // Fallback conversion if the stream returns a model
+      _existingExpense = ExpenseEntity(
+        id: expense.id,
+        userId: expense.userId,
+        title: expense.title,
+        amount: expense.amount,
+        category: expense.category,
+        date: expense.date,
+        note: expense.note,
+        createdAt: expense.createdAt ?? DateTime.now(),
+      );
     }
+
+    _titleController.text = _existingExpense!.title;
+    _amountController.text = _existingExpense!.amount.toStringAsFixed(2);
+    _noteController.text = _existingExpense!.note ?? '';
+    _selectedCategory = _existingExpense!.category;
+    _selectedDate = _existingExpense!.date;
   }
 
   @override
@@ -186,8 +201,8 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
         actions: [
           if (isEditing)
             IconButton(
-              icon: Icon(Icons.delete_outline_rounded,
-                  color: colorScheme.error),
+              icon:
+                  Icon(Icons.delete_outline_rounded, color: colorScheme.error),
               onPressed: opState.isLoading ? null : _delete,
               tooltip: AppStrings.deleteExpense,
             ),
@@ -202,7 +217,8 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
             children: [
               // Error state
               if (opState.errorMessage != null) ...[
-                _buildErrorBanner(opState.errorMessage!, colorScheme, textTheme),
+                _buildErrorBanner(
+                    opState.errorMessage!, colorScheme, textTheme),
                 const SizedBox(height: 16),
               ],
 
@@ -228,19 +244,22 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
               const SizedBox(height: 20),
 
               // ─── Category ─────────────────────────────────────────────
-              _buildSectionLabel(AppStrings.expenseCategory, textTheme, colorScheme),
+              _buildSectionLabel(
+                  AppStrings.expenseCategory, textTheme, colorScheme),
               const SizedBox(height: 12),
               _buildCategorySelector(colorScheme, textTheme),
               const SizedBox(height: 20),
 
               // ─── Date ─────────────────────────────────────────────────
-              _buildSectionLabel(AppStrings.expenseDate, textTheme, colorScheme),
+              _buildSectionLabel(
+                  AppStrings.expenseDate, textTheme, colorScheme),
               const SizedBox(height: 8),
               _buildDatePicker(colorScheme, textTheme, isDark),
               const SizedBox(height: 20),
 
               // ─── Note ─────────────────────────────────────────────────
-              _buildSectionLabel(AppStrings.expenseNote, textTheme, colorScheme),
+              _buildSectionLabel(
+                  AppStrings.expenseNote, textTheme, colorScheme),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _noteController,
@@ -272,9 +291,7 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            isEditing
-                                ? Icons.check_rounded
-                                : Icons.add_rounded,
+                            isEditing ? Icons.check_rounded : Icons.add_rounded,
                             size: 20,
                             color: colorScheme.onPrimary,
                           ),
@@ -283,8 +300,8 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
                             isEditing
                                 ? AppStrings.updateExpense
                                 : AppStrings.saveExpense,
-                            style: textTheme.titleMedium?.copyWith(
-                                color: colorScheme.onPrimary),
+                            style: textTheme.titleMedium
+                                ?.copyWith(color: colorScheme.onPrimary),
                           ),
                         ],
                       ),
@@ -321,8 +338,8 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
         children: [
           Text(
             AppStrings.expenseAmount,
-            style: textTheme.labelMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant),
+            style: textTheme.labelMedium
+                ?.copyWith(color: colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 8),
           Row(
@@ -332,15 +349,15 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
             children: [
               Text(
                 '\$',
-                style: textTheme.headlineMedium?.copyWith(
-                    color: colorScheme.primary),
+                style: textTheme.headlineMedium
+                    ?.copyWith(color: colorScheme.primary),
               ),
               const SizedBox(width: 4),
               IntrinsicWidth(
                 child: TextFormField(
                   controller: _amountController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   textAlign: TextAlign.center,
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(
@@ -359,7 +376,8 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
                       fontFamily: 'JetBrains Mono',
                       fontSize: 40,
                       fontWeight: FontWeight.w700,
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                      color:
+                          colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                       letterSpacing: -1.2,
                     ),
                     filled: false,
@@ -384,8 +402,7 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
     );
   }
 
-  Widget _buildCategorySelector(
-      ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildCategorySelector(ColorScheme colorScheme, TextTheme textTheme) {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -402,9 +419,7 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
                   : colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected
-                    ? category.color
-                    : Colors.transparent,
+                color: isSelected ? category.color : Colors.transparent,
                 width: 1.5,
               ),
             ),
@@ -425,8 +440,7 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
                     color: isSelected
                         ? category.color
                         : colorScheme.onSurfaceVariant,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                   ),
                 ),
               ],
@@ -452,8 +466,7 @@ class _AddEditExpenseViewState extends ConsumerState<AddEditExpenseView> {
         }
       },
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
           color: isDark
               ? AppColors.darkSurfaceContainerLow

@@ -18,7 +18,8 @@ class CategorySummaryView extends ConsumerStatefulWidget {
   const CategorySummaryView({super.key});
 
   @override
-  ConsumerState<CategorySummaryView> createState() => _CategorySummaryViewState();
+  ConsumerState<CategorySummaryView> createState() =>
+      _CategorySummaryViewState();
 }
 
 class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
@@ -26,16 +27,16 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
 
   void _previousMonth() {
     final current = ref.read(selectedMonthProvider);
-    final prevDate = DateTime(current.year, current.month - 1, 1);
+    final prev = DateTime(current.year, current.month - 1, 1);
     ref.read(selectedMonthProvider.notifier).state =
-        SelectedMonth.from(prevDate.year, prevDate.month);
+        SelectedMonth.from(prev.year, prev.month);
   }
 
   void _nextMonth() {
     final current = ref.read(selectedMonthProvider);
-    final nextDate = DateTime(current.year, current.month + 1, 1);
+    final next = DateTime(current.year, current.month + 1, 1);
     ref.read(selectedMonthProvider.notifier).state =
-        SelectedMonth.from(nextDate.year, nextDate.month);
+        SelectedMonth.from(next.year, next.month);
   }
 
   @override
@@ -46,8 +47,8 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
 
     final selectedMonth = ref.watch(selectedMonthProvider);
     final monthlyExpensesAsync = ref.watch(monthlyExpensesProvider);
-    final monthDate = DateTime(selectedMonth.year, selectedMonth.month);
-    final monthFormatted = DateFormat('MMMM yyyy').format(monthDate);
+    final monthFormatted = DateFormat('MMMM yyyy')
+        .format(DateTime(selectedMonth.year, selectedMonth.month));
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
@@ -70,18 +71,18 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.go(AppRoutes.addExpense),
-        tooltip: AppStrings.addExpense,
-        child: const Icon(Icons.add_rounded, size: 28),
+        onPressed: () => context.push(AppRoutes.addExpense),
+        backgroundColor: colorScheme.primary,
+        child: const Icon(Icons.add_rounded, size: 28, color: Colors.white),
       ),
       body: SafeArea(
         bottom: false,
         child: CustomScrollView(
           slivers: [
-            // ─── Header & Month Switcher ─────────────────────────────────────
+            // ─── Header ───────────────────────────────────────────────────────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -94,62 +95,50 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      AppStrings.categoryAnalytics,
+                      'Analytics',
                       style: textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Month selector pill
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? AppColors.darkSurfaceContainerLow
-                            : AppColors.lightSurfaceContainerLow,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isDark
-                              ? AppColors.darkOutlineVariant.withValues(alpha: 0.4)
-                              : AppColors.lightOutlineVariant.withValues(alpha: 0.4),
+
+                    // Month navigation
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: _previousMonth,
+                          icon: const Icon(Icons.chevron_left_rounded),
+                          style: IconButton.styleFrom(
+                            backgroundColor: isDark
+                                ? AppColors.darkSurfaceContainer
+                                : AppColors.lightSurfaceContainer,
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.chevron_left_rounded),
-                            onPressed: _previousMonth,
-                            tooltip: 'Previous month',
-                          ),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today_rounded,
-                                size: 16,
-                                color: colorScheme.primary,
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today_rounded,
+                                size: 16, color: colorScheme.primary),
+                            const SizedBox(width: 8),
+                            Text(
+                              monthFormatted,
+                              style: textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                monthFormatted,
-                                style: textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed:
+                              selectedMonth.isCurrentMonth ? null : _nextMonth,
+                          icon: const Icon(Icons.chevron_right_rounded),
+                          style: IconButton.styleFrom(
+                            backgroundColor: isDark
+                                ? AppColors.darkSurfaceContainer
+                                : AppColors.lightSurfaceContainer,
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.chevron_right_rounded),
-                            onPressed: selectedMonth.isCurrentMonth
-                                ? null
-                                : _nextMonth,
-                            tooltip: 'Next month',
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -158,23 +147,14 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
 
             // ─── Content ─────────────────────────────────────────────────────
             monthlyExpensesAsync.when(
-              loading: () => SliverPadding(
-                padding: const EdgeInsets.all(20),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (_, __) => const Padding(
-                      padding: EdgeInsets.only(bottom: 12),
-                      child: SkeletonCard(height: 80),
-                    ),
-                    childCount: 4,
-                  ),
+              loading: () => const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: SkeletonCard(height: 280),
                 ),
               ),
               error: (err, _) => SliverFillRemaining(
-                child: ErrorStateWidget(
-                  message: err.toString(),
-                  onRetry: () => ref.invalidate(monthlyExpensesProvider),
-                ),
+                child: Center(child: Text('Error: $err')),
               ),
               data: (expenses) {
                 if (expenses.isEmpty) {
@@ -182,9 +162,9 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                     child: EmptyStateWidget(
                       icon: Icons.pie_chart_outline_rounded,
                       title: 'No expenses for $monthFormatted',
-                      subtitle: 'Add expenses to see detailed category analytics.',
+                      subtitle: 'Add expenses to see analytics.',
                       action: FilledButton.icon(
-                        onPressed: () => context.go(AppRoutes.addExpense),
+                        onPressed: () => context.push(AppRoutes.addExpense),
                         icon: const Icon(Icons.add_rounded),
                         label: const Text(AppStrings.addExpense),
                       ),
@@ -192,134 +172,221 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                   );
                 }
 
-                final totalMonthly =
+                final total =
                     expenses.fold<double>(0, (sum, e) => sum + e.amount);
 
-                // Group by category
                 final Map<ExpenseCategory, List<ExpenseEntity>> byCat = {};
-                for (final expense in expenses) {
-                  byCat.putIfAbsent(expense.category, () => []).add(expense);
+                for (final e in expenses) {
+                  byCat.putIfAbsent(e.category, () => []).add(e);
                 }
 
-                // Sort categories by highest amount spent
                 final sortedCategories = byCat.keys.toList()
                   ..sort((a, b) {
-                    final sumA =
-                        byCat[a]!.fold<double>(0, (s, e) => s + e.amount);
-                    final sumB =
-                        byCat[b]!.fold<double>(0, (s, e) => s + e.amount);
+                    final sumA = byCat[a]!.fold(0.0, (s, e) => s + e.amount);
+                    final sumB = byCat[b]!.fold(0.0, (s, e) => s + e.amount);
                     return sumB.compareTo(sumA);
                   });
 
                 return SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 120),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      // Total Overview Card
+                      // ── Donut Chart Card ───────────────────────────────────
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: isDark
-                                ? [
-                                    AppColors.darkPrimaryContainer,
-                                    AppColors.darkSurfaceContainerHighest,
-                                  ]
-                                : [
-                                    AppColors.lightPrimary,
-                                    AppColors.lightPrimaryContainer,
-                                  ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(20),
+                          color: isDark
+                              ? AppColors.darkSurfaceContainerLowest
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: (isDark
-                                      ? AppColors.darkPrimary
-                                      : AppColors.lightPrimary)
-                                  .withValues(alpha: 0.25),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 16,
-                              offset: const Offset(0, 6),
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
                         child: Column(
+                          children: [
+                            SizedBox(
+                              height: 220,
+                              width: 220,
+                              child: CustomPaint(
+                                painter: _DonutChartPainter(
+                                  categories: sortedCategories,
+                                  byCat: byCat,
+                                  total: total,
+                                ),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'TOTAL SPENT',
+                                        style: textTheme.labelSmall?.copyWith(
+                                          color: colorScheme.onSurfaceVariant,
+                                          letterSpacing: 1.1,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        Formatters.currency(total),
+                                        style:
+                                            textTheme.headlineMedium?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: -0.5,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: isDark
+                                              ? AppColors.darkSurfaceContainer
+                                              : AppColors.lightSurfaceContainer,
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                        ),
+                                        child: Text(
+                                          '${expenses.length} Expenses',
+                                          style: textTheme.labelSmall?.copyWith(
+                                            color: colorScheme.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // Legend
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 8,
+                              children: sortedCategories.map((cat) {
+                                final catTotal = byCat[cat]!
+                                    .fold(0.0, (s, e) => s + e.amount);
+                                final percent =
+                                    total > 0 ? (catTotal / total) * 100 : 0.0;
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? AppColors.darkSurfaceContainerLow
+                                        : AppColors.lightSurfaceContainerLow,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: BoxDecoration(
+                                          color: cat.color,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '${cat.label.split(' ').first} ${percent.toStringAsFixed(1)}%',
+                                        style: textTheme.labelSmall?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // ── Insight Card ───────────────────────────────────────
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? AppColors.darkSurfaceContainerLow
+                              : AppColors.lightSurfaceContainerLow,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'TOTAL SPENT IN $monthFormatted'.toUpperCase(),
-                              style: textTheme.labelSmall?.copyWith(
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
                                 color: isDark
-                                    ? AppColors.darkOnPrimaryContainer
-                                    : Colors.white.withValues(alpha: 0.8),
-                                letterSpacing: 1.2,
+                                    ? AppColors.darkSecondaryContainer
+                                    : AppColors.lightSecondaryContainer,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.lightbulb_rounded,
+                                color: isDark
+                                    ? AppColors.darkOnSecondaryContainer
+                                    : AppColors.lightOnSecondaryContainer,
+                                size: 20,
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              Formatters.currency(totalMonthly),
-                              style: textTheme.displayMedium?.copyWith(
-                                color: isDark
-                                    ? AppColors.darkOnPrimaryContainer
-                                    : Colors.white,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              '${expenses.length} transactions across ${byCat.keys.length} categories',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: isDark
-                                    ? AppColors.darkOnPrimaryContainer
-                                        .withValues(alpha: 0.8)
-                                    : Colors.white.withValues(alpha: 0.85),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'MONTHLY INSIGHT',
+                                    style: textTheme.labelSmall?.copyWith(
+                                      color: colorScheme.primary,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    'You have ${expenses.length} expenses totaling ${Formatters.currency(total)} this month.',
+                                    style: textTheme.bodyMedium
+                                        ?.copyWith(height: 1.35),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
-
-                      // Segment bar overview
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: SizedBox(
-                          height: 12,
-                          child: Row(
-                            children: sortedCategories.map((cat) {
-                              final catTotal = byCat[cat]!
-                                  .fold<double>(0, (s, e) => s + e.amount);
-                              final ratio =
-                                  totalMonthly > 0 ? catTotal / totalMonthly : 0.0;
-                              return Expanded(
-                                flex: (ratio * 1000).toInt().clamp(1, 1000),
-                                child: Container(
-                                  color: cat.color,
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: 24),
 
+                      // ── Categories Header ──────────────────────────────────
                       Text(
-                        'Category Breakdown',
+                        'Categories',
                         style: textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Tap a category to expand and see transactions',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                       const SizedBox(height: 12),
 
-                      // Category Cards List
+                      // ── Category Cards (Expandable) ────────────────────────
                       ...sortedCategories.map((cat) {
                         final catExpenses = byCat[cat]!;
-                        final catTotal = catExpenses.fold<double>(
-                            0, (s, e) => s + e.amount);
-                        final percent = totalMonthly > 0
-                            ? (catTotal / totalMonthly) * 100
-                            : 0.0;
+                        final catTotal =
+                            catExpenses.fold(0.0, (s, e) => s + e.amount);
+                        final percent =
+                            total > 0 ? (catTotal / total) * 100 : 0.0;
                         final isExpanded = _expandedCategory == cat;
 
                         return Container(
@@ -327,11 +394,11 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                           decoration: BoxDecoration(
                             color: isDark
                                 ? AppColors.darkSurfaceContainerLowest
-                                : AppColors.lightSurfaceContainerLowest,
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: isExpanded
-                                  ? cat.color.withValues(alpha: 0.4)
+                                  ? cat.color.withValues(alpha: 0.45)
                                   : Colors.transparent,
                               width: 1.5,
                             ),
@@ -345,11 +412,11 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                           ),
                           child: Column(
                             children: [
+                              // Header – tap to expand / collapse
                               InkWell(
                                 onTap: () {
                                   setState(() {
-                                    _expandedCategory =
-                                        isExpanded ? null : cat;
+                                    _expandedCategory = isExpanded ? null : cat;
                                   });
                                 },
                                 borderRadius: BorderRadius.circular(16),
@@ -367,11 +434,8 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                             ),
-                                            child: Icon(
-                                              cat.icon,
-                                              color: cat.color,
-                                              size: 22,
-                                            ),
+                                            child: Icon(cat.icon,
+                                                color: cat.color, size: 22),
                                           ),
                                           const SizedBox(width: 12),
                                           Expanded(
@@ -387,7 +451,7 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${catExpenses.length} ${catExpenses.length == 1 ? 'transaction' : 'transactions'} • ${percent.toStringAsFixed(1)}%',
+                                                  '${catExpenses.length} transactions • ${percent.toStringAsFixed(1)}%',
                                                   style: textTheme.bodySmall
                                                       ?.copyWith(
                                                     color: colorScheme
@@ -403,7 +467,7 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                                             children: [
                                               Text(
                                                 Formatters.currency(catTotal),
-                                                style: textTheme.titleMedium
+                                                style: textTheme.titleSmall
                                                     ?.copyWith(
                                                   fontWeight: FontWeight.w700,
                                                 ),
@@ -421,7 +485,6 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                                         ],
                                       ),
                                       const SizedBox(height: 12),
-                                      // Progress bar
                                       ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(100),
@@ -434,8 +497,7 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                                                   .lightSurfaceContainerHighest,
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                            cat.color,
-                                          ),
+                                                  cat.color),
                                           minHeight: 6,
                                         ),
                                       ),
@@ -444,7 +506,7 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                                 ),
                               ),
 
-                              // Expanded transactions list
+                              // Expanded transactions
                               if (isExpanded) ...[
                                 const Divider(height: 1),
                                 Padding(
@@ -494,22 +556,73 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
                                     ],
                                   ),
                                 ),
-                                ...catExpenses.map((expense) => Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          12, 0, 12, 8),
-                                      child: ExpenseTile(
-                                        expense: expense,
-                                        onTap: () => context.go(
-                                          '${AppRoutes.editExpense}/${expense.id}',
-                                        ),
+                                ...catExpenses.map(
+                                  (expense) => Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                                    child: ExpenseTile(
+                                      expense: expense,
+                                      onTap: () => context.push(
+                                        '${AppRoutes.editExpense}/${expense.id}',
                                       ),
-                                    )),
+                                    ),
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
                               ],
                             ],
                           ),
                         );
                       }),
+
+                      const SizedBox(height: 20),
+
+                      // ── Export Buttons ─────────────────────────────────────
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('PDF export coming soon')),
+                                );
+                              },
+                              icon: const Icon(Icons.picture_as_pdf_rounded,
+                                  color: Colors.redAccent),
+                              label: const Text('Export PDF'),
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('CSV export coming soon')),
+                                );
+                              },
+                              icon: Icon(Icons.table_view_rounded,
+                                  color: colorScheme.primary),
+                              label: const Text('Export CSV'),
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ]),
                   ),
                 );
@@ -520,4 +633,46 @@ class _CategorySummaryViewState extends ConsumerState<CategorySummaryView> {
       ),
     );
   }
+}
+
+/// Simple donut chart painter
+class _DonutChartPainter extends CustomPainter {
+  final List<ExpenseCategory> categories;
+  final Map<ExpenseCategory, List<ExpenseEntity>> byCat;
+  final double total;
+
+  _DonutChartPainter({
+    required this.categories,
+    required this.byCat,
+    required this.total,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (total <= 0) return;
+
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2 - 8;
+    const strokeWidth = 28.0;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+
+    double startAngle = -90 * (3.1415926535 / 180);
+
+    for (final cat in categories) {
+      final catTotal = byCat[cat]!.fold(0.0, (s, e) => s + e.amount);
+      final sweepAngle = (catTotal / total) * 2 * 3.1415926535;
+
+      final paint = Paint()
+        ..color = cat.color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.butt;
+
+      canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
+      startAngle += sweepAngle;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
