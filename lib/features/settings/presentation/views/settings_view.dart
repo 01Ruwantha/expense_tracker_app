@@ -56,7 +56,8 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
             const SizedBox(height: 16),
             TextField(
               controller: controller,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               autofocus: true,
               decoration: const InputDecoration(
                 prefixText: '\$ ',
@@ -209,7 +210,6 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               ),
               child: Row(
                 children: [
-                  // Avatar with initials
                   Container(
                     width: 60,
                     height: 60,
@@ -263,7 +263,8 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.incomeGreen.withValues(alpha: 0.15),
+                            color:
+                                AppColors.incomeGreen.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Row(
@@ -361,7 +362,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
             ),
             const SizedBox(height: 24),
 
-            // ─── Section: Financial Targets ──────────────────────────────────
+            // ─── Section: Financial Target ────────────────────────────────────
             _buildSectionHeader(context, 'Financial Target'),
             const SizedBox(height: 8),
             Container(
@@ -371,58 +372,110 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                     : AppColors.lightSurfaceContainerLowest,
                 borderRadius: BorderRadius.circular(16),
               ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Column(
                 children: [
-                  ListTile(
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.savings_rounded,
-                        color: colorScheme.onPrimaryContainer,
-                        size: 20,
-                      ),
-                    ),
-                    title: const Text('Monthly Budget Limit'),
-                    subtitle: Text(
-                      'Target spend: ${Formatters.currency(_monthlyBudget)}',
-                    ),
-                    trailing: FilledButton.tonal(
-                      onPressed: _editBudget,
-                      style: FilledButton.styleFrom(
-                        visualDensity: VisualDensity.compact,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                      ),
-                      child: const Text('Change'),
+                  // Monthly Budget Limit
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.savings_rounded,
+                            color: colorScheme.onPrimaryContainer,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Monthly Budget Limit',
+                                style: TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Target spend: ${Formatters.currency(_monthlyBudget)}',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          height: 36,
+                          child: FilledButton.tonal(
+                            onPressed: _editBudget,
+                            style: FilledButton.styleFrom(
+                              visualDensity: VisualDensity.compact,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 14),
+                              minimumSize: const Size(0, 36),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text('Change'),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const Divider(height: 1, indent: 64),
-                  ListTile(
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.attach_money_rounded,
-                        color: colorScheme.onSecondaryContainer,
-                        size: 20,
-                      ),
-                    ),
-                    title: const Text('Currency'),
-                    subtitle: const Text('US Dollar (\$)'),
-                    trailing: Text(
-                      'USD',
-                      style: textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                  const Divider(height: 1),
+                  // Currency
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: colorScheme.secondaryContainer,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.attach_money_rounded,
+                            color: colorScheme.onSecondaryContainer,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Currency',
+                                style: TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'US Dollar (\$)',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          'USD',
+                          style: textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -502,51 +555,78 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                     : AppColors.lightSurfaceContainerLowest,
                 borderRadius: BorderRadius.circular(16),
               ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Column(
                 children: [
-                  ListTile(
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.info_outline_rounded,
-                        color: colorScheme.onSurfaceVariant,
-                        size: 20,
-                      ),
-                    ),
-                    title: const Text('Version'),
-                    trailing: Text(
-                      '1.0.0 (Build 1)',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                  // Version
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.info_outline_rounded,
+                            color: colorScheme.onSurfaceVariant,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Text(
+                            'Version',
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        Text(
+                          '1.0.0',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const Divider(height: 1, indent: 64),
-                  ListTile(
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        Icons.auto_awesome_rounded,
-                        color: colorScheme.primary,
-                        size: 20,
-                      ),
-                    ),
-                    title: const Text('Design System'),
-                    trailing: Text(
-                      'Google Stitch M3',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                  const Divider(height: 1),
+                  // Design System
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.auto_awesome_rounded,
+                            color: colorScheme.primary,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Text(
+                            'Design System',
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        Text(
+                          'Stitch M3',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -557,7 +637,8 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
             // ─── Sign Out Button ──────────────────────────────────────────────
             OutlinedButton.icon(
               onPressed: _confirmSignOut,
-              icon: const Icon(Icons.logout_rounded, color: AppColors.lightError),
+              icon:
+                  const Icon(Icons.logout_rounded, color: AppColors.lightError),
               label: const Text(
                 AppStrings.signOut,
                 style: TextStyle(

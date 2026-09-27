@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'firebase_options.dart';
 import 'core/constants/app_strings.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
@@ -15,14 +16,13 @@ Future<void> main() async {
   await Hive.initFlutter();
   await Hive.openBox('settings');
 
-  // Initialize Firebase (safely handles environments before flutterfire configure)
+  // Initialize Firebase with platform-specific options
   try {
-    await Firebase.initializeApp();
-  } catch (e) {
-    debugPrint(
-      'Notice: Firebase.initializeApp() skipped or not configured yet: $e. '
-      'Run `flutterfire configure` to connect your specific Firebase project.',
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
     );
+  } catch (e) {
+    debugPrint('Notice: Firebase.initializeApp() error: $e');
   }
 
   runApp(

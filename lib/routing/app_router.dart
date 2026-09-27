@@ -34,7 +34,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
 
   return GoRouter(
-    initialLocation: AppRoutes.home,
+    initialLocation: AppRoutes.signIn,
     redirect: (context, state) {
       final isLoading = authState.isLoading;
       if (isLoading) return null;

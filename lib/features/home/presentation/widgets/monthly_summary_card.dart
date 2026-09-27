@@ -90,32 +90,39 @@ class MonthlySummaryCard extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top row: title + indicator
+                // Top row: title + month (FIXED - no overflow)
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isDark
-                                ? AppColors.darkSecondaryFixed
-                                : AppColors.lightSecondaryFixed,
+                    // Left side (flexible)
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isDark
+                                  ? AppColors.darkSecondaryFixed
+                                  : AppColors.lightSecondaryFixed,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          AppStrings.thisMonthTotal,
-                          style: textTheme.labelMedium?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            letterSpacing: 0.5,
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              AppStrings.thisMonthTotal,
+                              style: textTheme.labelMedium?.copyWith(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                letterSpacing: 0.5,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     // Month label
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -148,21 +155,24 @@ class MonthlySummaryCard extends ConsumerWidget {
                   ),
                   error: (_, __) => Text(
                     'Error loading',
-                    style: textTheme.headlineMedium
-                        ?.copyWith(color: Colors.white),
+                    style:
+                        textTheme.headlineMedium?.copyWith(color: Colors.white),
                   ),
                   data: (_) => Row(
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Text(
-                        Formatters.currency(total),
-                        style: const TextStyle(
-                          fontFamily: 'JetBrains Mono',
-                          fontSize: 40,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -1.2,
-                          color: Colors.white,
+                      Flexible(
+                        child: Text(
+                          Formatters.currency(total),
+                          style: const TextStyle(
+                            fontFamily: 'JetBrains Mono',
+                            fontSize: 40,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -1.2,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -183,14 +193,17 @@ class MonthlySummaryCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          '${Formatters.currency(total)} of ${Formatters.currency(budget)} budget',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.9),
+                        Expanded(
+                          child: Text(
+                            '${Formatters.currency(total)} of ${Formatters.currency(budget)} budget',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 2),
@@ -199,7 +212,7 @@ class MonthlySummaryCard extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(100),
                           ),
                           child: Text(
-                            '${(percentage * 100).toStringAsFixed(0)}% ${AppStrings.budgetUsed}',
+                            '${(percentage * 100).toStringAsFixed(0)}%',
                             style: textTheme.labelSmall?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
@@ -240,10 +253,13 @@ class MonthlySummaryCard extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          '${Formatters.currency(remaining)} ${AppStrings.remaining}',
-                          style: textTheme.labelSmall?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.7),
+                        Flexible(
+                          child: Text(
+                            '${Formatters.currency(remaining)} ${AppStrings.remaining}',
+                            style: textTheme.labelSmall?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.7),
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         Text(

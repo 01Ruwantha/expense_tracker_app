@@ -45,8 +45,8 @@ class AuthRepositoryImpl implements AuthRepository {
       if (user == null) return const Left(AuthFailure('Sign in failed'));
       return Right(user);
     } on FirebaseAuthException catch (e) {
-      return Left(AuthFailure(_mapFirebaseError(e.code)));
-    } on Exception catch (e) {
+      return Left(AuthFailure(_mapFirebaseError(e.code, e.message)));
+    } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -62,14 +62,18 @@ class AuthRepositoryImpl implements AuthRepository {
         email: email,
         password: password,
       );
-      await cred.user?.updateDisplayName(displayName);
-      await cred.user?.reload();
-      final user = _mapUser(_auth.currentUser);
+      if (displayName.isNotEmpty) {
+        try {
+          await cred.user?.updateDisplayName(displayName);
+          await cred.user?.reload();
+        } catch (_) {}
+      }
+      final user = _mapUser(_auth.currentUser ?? cred.user);
       if (user == null) return const Left(AuthFailure('Sign up failed'));
       return Right(user);
     } on FirebaseAuthException catch (e) {
-      return Left(AuthFailure(_mapFirebaseError(e.code)));
-    } on Exception catch (e) {
+      return Left(AuthFailure(_mapFirebaseError(e.code, e.message)));
+    } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -80,8 +84,8 @@ class AuthRepositoryImpl implements AuthRepository {
       await _auth.sendPasswordResetEmail(email: email);
       return const Right(null);
     } on FirebaseAuthException catch (e) {
-      return Left(AuthFailure(_mapFirebaseError(e.code)));
-    } on Exception catch (e) {
+      return Left(AuthFailure(_mapFirebaseError(e.code, e.message)));
+    } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
@@ -91,12 +95,15 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _auth.signOut();
       return const Right(null);
-    } on Exception catch (e) {
+    } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
 
-  String _mapFirebaseError(String code) {
+  String _mapFirebaseError(String code, [String? message]) {
+    if (message != null && message.contains('CONFIGURATION_NOT_FOUND')) {
+      return 'Email/Password sign-in is not enabled in Firebase Console. Go to Authentication > Sign-in method in Firebase Console and enable Email/Password.';
+    }
     switch (code) {
       case 'user-not-found':
         return 'No account found with this email.';
@@ -105,7 +112,7 @@ class AuthRepositoryImpl implements AuthRepository {
       case 'invalid-credential':
         return 'Invalid email or password.';
       case 'email-already-in-use':
-        return 'An account with this email already exists.';
+        return 'An account with this email already exists. Try signing in.';
       case 'weak-password':
         return 'Password is too weak. Use at least 6 characters.';
       case 'invalid-email':
@@ -116,8 +123,12 @@ class AuthRepositoryImpl implements AuthRepository {
         return 'This account has been disabled.';
       case 'network-request-failed':
         return 'Network error. Check your connection.';
+      case 'operation-not-allowed':
+        return 'Email/Password sign-in is disabled in Firebase Console. Please enable it under Authentication > Sign-in method.';
+      case 'configuration-not-found':
+        return 'Firebase Authentication configuration not found. Please enable Email/Password in Firebase Console.';
       default:
-        return 'Authentication failed. Please try again.';
+        return message ?? 'Authentication failed ($code). Please try again.';
     }
   }
 }

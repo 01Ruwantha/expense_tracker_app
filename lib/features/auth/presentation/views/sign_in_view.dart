@@ -30,10 +30,13 @@ class _SignInViewState extends ConsumerState<SignInView> {
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
     final vm = ref.read(authViewModelProvider.notifier);
-    await vm.signIn(
+    final success = await vm.signIn(
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
+    if (success && mounted) {
+      context.go(AppRoutes.home);
+    }
   }
 
   @override

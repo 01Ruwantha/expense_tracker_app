@@ -21,7 +21,7 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
-  bool _agreedToTerms = false;
+  bool _agreedToTerms = true;
 
   @override
   void dispose() {
@@ -41,11 +41,14 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
       );
       return;
     }
-    await ref.read(authViewModelProvider.notifier).signUp(
+    final success = await ref.read(authViewModelProvider.notifier).signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text,
           displayName: _nameController.text.trim(),
         );
+    if (success && mounted) {
+      context.go(AppRoutes.home);
+    }
   }
 
   @override
