@@ -44,27 +44,30 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
   }
 
   void _onSearchChanged(String query) {
-    ref.read(expenseFilterProvider.notifier).update(
-          (state) => state.copyWith(
-            searchQuery: query.trim().isEmpty ? null : query.trim(),
-            clearSearch: query.trim().isEmpty,
-          ),
-        );
+    final current = ref.read(expenseFilterProvider);
+    ref.read(expenseFilterProvider.notifier).state = ExpenseFilter(
+      category: current.category,
+      startDate: current.startDate,
+      endDate: current.endDate,
+      searchQuery: query.trim().isEmpty ? null : query.trim(),
+    );
   }
 
   void _selectCategory(ExpenseCategory? category) {
-    ref.read(expenseFilterProvider.notifier).update(
-          (state) => state.copyWith(
-            category: category,
-            clearCategory: category == null,
-          ),
-        );
+    final current = ref.read(expenseFilterProvider);
+    ref.read(expenseFilterProvider.notifier).state = ExpenseFilter(
+      category: category, // null = All
+      startDate: current.startDate,
+      endDate: current.endDate,
+      searchQuery: current.searchQuery,
+    );
   }
 
   void _applyDateFilter(DateQuickFilter quickFilter) async {
     final now = DateTime.now();
     DateTime? start;
     DateTime? end;
+    final current = ref.read(expenseFilterProvider);
 
     switch (quickFilter) {
       case DateQuickFilter.all:
@@ -85,9 +88,8 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
           firstDate: DateTime(2020),
           lastDate: DateTime.now().add(const Duration(days: 365)),
           initialDateRange: DateTimeRange(
-            start: ref.read(expenseFilterProvider).startDate ??
-                now.subtract(const Duration(days: 30)),
-            end: ref.read(expenseFilterProvider).endDate ?? now,
+            start: current.startDate ?? now.subtract(const Duration(days: 30)),
+            end: current.endDate ?? now,
           ),
         );
         if (range == null) return;
@@ -98,13 +100,13 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
     }
 
     setState(() => _dateFilter = quickFilter);
-    ref.read(expenseFilterProvider.notifier).update(
-          (state) => state.copyWith(
-            startDate: start,
-            endDate: end,
-            clearDates: quickFilter == DateQuickFilter.all,
-          ),
-        );
+
+    ref.read(expenseFilterProvider.notifier).state = ExpenseFilter(
+      category: current.category,
+      startDate: start,
+      endDate: end,
+      searchQuery: current.searchQuery,
+    );
   }
 
   void _resetFilters() {
@@ -427,7 +429,6 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                 );
               }
 
-              // Compute total for filtered list
               final totalAmount =
                   expenses.fold<double>(0, (sum, e) => sum + e.amount);
               final grouped = _groupByDate(expenses);
@@ -437,7 +438,6 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                 itemCount: grouped.keys.length + 1,
                 itemBuilder: (context, index) {
                   if (index == 0) {
-                    // Summary card header
                     return Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.symmetric(
@@ -482,7 +482,6 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Date Group Header
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Row(
@@ -504,7 +503,6 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                           ],
                         ),
                       ),
-                      // Expenses in this group
                       ...groupExpenses.map((expense) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
@@ -526,13 +524,19 @@ class _HistoryViewState extends ConsumerState<HistoryView> {
                             ),
                             confirmDismiss: (_) async {
                               _deleteExpense(expense);
-                              return false; // delete dialog will handle deletion
+                              return false;
                             },
                             child: ExpenseTile(
                               expense: expense,
-                              onTap: () => context.push(
-                                '${AppRoutes.editExpense}/${expense.id}',
-                              ),
+                              onTap: () {
+                                if (expense.id.isEmpty) return;
+                                context.pushNamed(
+                                  'edit-expense',
+                                  pathParameters: {
+                                    AppRouteParams.expenseId: expense.id,
+                                  },
+                                );
+                              },
                             ),
                           ),
                         );
