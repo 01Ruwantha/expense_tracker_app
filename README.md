@@ -19,7 +19,7 @@
 <p align="center">
   <!-- Replace with your actual demo GIF link -->
   <img 
-  src="https://github.com/01Ruwantha/expense_tracker_app/blob/ffd3947c64c2c40ed6635070b3b6d8fceaf4a6dd/assets/video/Expense_tracker.gif" 
+  src="https://github.com/01Ruwantha/expense_tracker_app/blob/73ba64ec7d3e5caccf88c620cd24ac6bd0a8f207/assets/video/Expense_tracker.gif?raw=true" 
   alt="App Demo Video" 
   width="150" 
   height="300"
