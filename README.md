@@ -19,8 +19,8 @@
 <p align="center">
   <!-- Replace with your actual demo GIF link -->
   <img 
-  src="https://github.com/01Ruwantha/expense_tracker_app/blob/d0ab0a186cfcf63a4cab102b382d1027f3462ae6/assets/Expense_tracker.gif" 
-  alt="App Demo" 
+  src="https://github.com/01Ruwantha/expense_tracker_app/blob/ffd3947c64c2c40ed6635070b3b6d8fceaf4a6dd/assets/video/Expense_tracker.gif" 
+  alt="App Demo Video" 
   width="150" 
   height="300"
 />
@@ -30,13 +30,13 @@
 
 <div align="center">
 
-| Home Screen | History | Category Analytics |
+| Splash Screen | Home | History |
 |-------------|---------|--------------------|
-| <img src="YOUR_HOME_IMAGE_LINK" alt="Home" width="150" height="300"> | <img src="YOUR_HISTORY_IMAGE_LINK" alt="History" width="150" height="300"> | <img src="YOUR_ANALYTICS_IMAGE_LINK" alt="Analytics" width="150" height="300"> |
+| <img src="https://github.com/01Ruwantha/expense_tracker_app/blob/0a7514cd3adba4dbfb00388a0d751250cdfb5f56/assets/screenshots/splash_page.jpeg" alt="Splash" width="150" height="300"> | <img src="https://github.com/01Ruwantha/expense_tracker_app/blob/0a7514cd3adba4dbfb00388a0d751250cdfb5f56/assets/screenshots/home_page.jpeg" alt="home" width="150" height="300"> | <img src="https://github.com/01Ruwantha/expense_tracker_app/blob/ffd3947c64c2c40ed6635070b3b6d8fceaf4a6dd/assets/screenshots/history_page.jpeg" alt="history" width="150" height="300"> |
 
-| Add Expense | Settings (Light) | Settings (Dark) |
-|-------------|------------------|-----------------|
-| <img src="YOUR_ADD_EXPENSE_IMAGE_LINK" alt="Add Expense" width="150" height="300"> | <img src="YOUR_SETTINGS_LIGHT_IMAGE_LINK" alt="Settings Light" width="150" height="300">| <img src="YOUR_SETTINGS_DARK_IMAGE_LINK" alt="Settings Dark" width="150" height="300"> |
+| Categories | Settings  |
+|-------------|------------------|
+| <img src="https://github.com/01Ruwantha/expense_tracker_app/blob/ffd3947c64c2c40ed6635070b3b6d8fceaf4a6dd/assets/screenshots/categories_page.jpeg" alt="Add Expense" width="150" height="300"> | <img src="https://github.com/01Ruwantha/expense_tracker_app/blob/ffd3947c64c2c40ed6635070b3b6d8fceaf4a6dd/assets/screenshots/settings_page.jpeg" alt="Settings" width="150" height="300">|
 
 </div>
 
@@ -178,7 +178,7 @@ Having trouble? Contact us or create an issue:
 <div align="center">
 <p align="center">
   <img 
-  src="https://github.com/01Ruwantha/quick_slice/blob/main/Screenshots/QuickSliceImg.png?raw=true" 
+  src="https://github.com/01Ruwantha/expense_tracker_app/blob/0a7514cd3adba4dbfb00388a0d751250cdfb5f56/assets/images/Expense_tracker_img.png" 
   alt="QuickSlice Post Image" 
   width="1080" 
   height="720"
