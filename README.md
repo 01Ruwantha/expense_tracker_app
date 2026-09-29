@@ -40,6 +40,8 @@
 
 </div>
 
+<img src="https://github.com/01Ruwantha/expense_tracker_app/blob/bb813299d2a08ac22b3fe381a70198f54a340a16/assets/screenshots/app%20store%20images.png" alt="App store images" >
+
 ## ✨ Features
 
 ### 🎯 Core Features
